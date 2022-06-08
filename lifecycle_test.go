@@ -143,3 +143,31 @@ func TestSetArgvEx(t *testing.T) {
 
 	Py_Finalize()
 }
+
+func TestNewInterpreter(t *testing.T) {
+
+	Py_Initialize()
+	assert.True(t, Py_IsInitialized())
+
+	mainThread := PyEval_SaveThread()
+
+	func() {
+		_gil := PyGILState_Ensure()
+		_gilState := PyGILState_GetThisThreadState()
+
+		subInterpreter := Py_NewInterpreter()
+		if subInterpreter == nil {
+			t.Fatalf("NewInterpreter fail")
+		}
+		PyThreadState_Swap(subInterpreter)
+		Py_EndInterpreter(subInterpreter)
+
+		PyThreadState_Swap(_gilState)
+		PyGILState_Release(_gil)
+	}()
+
+	PyEval_RestoreThread(mainThread)
+
+	Py_Finalize()
+	assert.False(t, Py_IsInitialized())
+}

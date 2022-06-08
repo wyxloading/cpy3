@@ -285,3 +285,13 @@ func Py_GetPythonHome() (string, error) {
 
 	return C.GoString(chome), nil
 }
+
+//Py_NewInterpreter : https://docs.python.org/3.7/c-api/init.html#c.Py_NewInterpreter
+func Py_NewInterpreter() *PyThreadState {
+	return (*PyThreadState)(C.Py_NewInterpreter())
+}
+
+// Py_EndInterpreter : https://docs.python.org/3.7/c-api/init.html#c.Py_EndInterpreter
+func Py_EndInterpreter(tstate *PyThreadState) {
+	C.Py_EndInterpreter((*C.PyThreadState)(tstate))
+}
